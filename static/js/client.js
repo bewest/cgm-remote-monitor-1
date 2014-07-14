@@ -676,7 +676,7 @@
                 $('#lastEntry').text(timeAgo(secsSinceLast)).toggleClass('current', secsSinceLast < 10 * 60);
                 $('.container .currentBG').text(currentBG);
                 $('.container .currentDirection').html(current.direction);
-                $('.container .current').toggleClass('high', current.y > 108).toggleClass('low', current.y < 70)
+                $('.container .current').toggleClass('high', current.y > 108).toggleClass('low', current.y < 94)
             }
             data = d[0].map(function (obj) { return { date: new Date(obj.x), sgv: scaleBg(obj.y), direction: obj.direction, color: 'grey'} });
             data = data.concat(d[1].map(function (obj) { return { date: new Date(obj.x), sgv: scaleBg(obj.y), color: 'blue'} }));
