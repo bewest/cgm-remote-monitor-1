@@ -999,6 +999,36 @@ var app = {}, browserSettings = {}, browserStorage = $.localStorage;
                     .attr('y2', yScale2(scaleBg(app.thresholds.bg_target_bottom)));
             }
         }
+        console.log('CURRENT height', focusHeight, app.thresholds);
+        console.log('thresholds', app.thresholds.bg_target_top, app.thresholds.bg_target_bottom);
+        var midBg = (app.thresholds.bg_target_top + app.thresholds.bg_target_bottom) / 2;
+        var midHeight = focusHeight / 2;
+
+        tickValues[3] = midBg;
+        console.log('ticks', tickValues);
+        yAxis.ticks(6).tickValues(tickValues);
+                focus.select('.y')
+                    .attr('transform', 'translate(' + chartWidth + ',0)')
+                    .call(yAxis);
+        console.log('MIDPOINT', midBg, midHeight);
+        console.log('USING invert', yScale(midBg), yScale.invert(midHeight));
+        focus.append('line')
+          .attr('class', 'mid-line')
+          .attr('stroke', 'red')
+          .attr('x1', xScale(dataRange[0]))
+          .attr('y1', yScale(scaleBg(midBg)))
+          .attr('x2', xScale(dataRange[1]))
+          .attr('y2', yScale(scaleBg(midBg)));
+        /*
+        focus.append('line')
+          .attr('class', 'mid-line')
+          .attr('stroke', 'yellow')
+          .attr('x1', xScale(dataRange[0]))
+          .attr('y1', midHeight)
+          .attr('x2', xScale(dataRange[1]))
+          .attr('y2', midHeight);
+        */
+
 
         // update domain
         xScale2.domain(dataRange);
@@ -1459,6 +1489,7 @@ var app = {}, browserSettings = {}, browserStorage = $.localStorage;
                 , app.thresholds.bg_low
                 , app.thresholds.bg_target_bottom
                 , 120
+                // ((app.thresholds.bg_target_bottom + app.thresholds.bg_target_top) / 2).toFixed(0)
                 , app.thresholds.bg_target_top
                 , app.thresholds.bg_high
                 , 400
