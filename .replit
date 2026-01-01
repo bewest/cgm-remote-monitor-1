@@ -40,3 +40,7 @@ outputType = "webview"
 deploymentTarget = "autoscale"
 run = ["node", "lib/server/server.js"]
 build = ["npm", "run", "bundle"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80
