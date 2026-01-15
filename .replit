@@ -8,7 +8,7 @@ expertMode = true
 [userenv.shared]
 PORT = "5000"
 HOSTNAME = "0.0.0.0"
-MONGO_CONNECTION = "mongodb://localhost:27017/nightscout"
+MONGO_CONNECTION = "mongodb://c1ed90009d75f8022d0a:49e461d71273f892a3e7@143.198.41.180/admin"
 API_SECRET = "nightscout_secure_password"
 INSECURE_USE_HTTP = "true"
 
@@ -44,3 +44,6 @@ build = ["npm", "run", "bundle"]
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[nix]
+packages = ["vim"]
