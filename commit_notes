@@ -1,0 +1,45 @@
+ensure obfuscation only affects rendered values
+
+The results to render may come from an in-memory cache, or from the database.
+If they came from the in-memory cache, it's possible that obscurring the device
+field could actually change the values in memory.  When obscurring, the device
+field, this patch copies all of the values in order to ensure that the
+in-memory copies are unaffected.  With this patch, cached objects should not be
+affected.
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch wip/bewest/obscure-provenance
+# Changes to be committed:
+#	modified:   lib/middleware/obscure-provenance.js
+#
+# Untracked files:
+#	.npmrc
+#	junk.json
+#	stats.json
+#
+# ------------------------ >8 ------------------------
+# Do not modify or remove the line above.
+# Everything below it will be ignored.
+diff --git a/lib/middleware/obscure-provenance.js b/lib/middleware/obscure-provenance.js
+index 11742f38..47add1b3 100644
+--- a/lib/middleware/obscure-provenance.js
++++ b/lib/middleware/obscure-provenance.js
+@@ -1,11 +1,14 @@
++var _ = require('lodash');
+ 
+ module.exports = function create_device_obscurity (env) {
+   function obscure_device (req, res, next) {
+-    if (res.entries && env.settings.obscureDeviceProvenance) {
++    var entries = _.cloneDeep(res.entries);
++    if (entries && env.settings.obscureDeviceProvenance) {
+       for (var i = 0; i < res.entries.length; i++) {
+-        res.entries[i].device = env.settings.obscureDeviceProvenance;
++        entries[i].device = env.settings.obscureDeviceProvenance;
+       }
+     }
++    res.entries = entries;
+     next( );
+   }
+   return obscure_device;

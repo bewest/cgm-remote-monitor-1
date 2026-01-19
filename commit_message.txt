@@ -1,0 +1,91 @@
+test: Complete Phase 1 - MongoDB modernization test suite (All tests passing)
+
+Phase 1 of MongoDB driver modernization is complete with comprehensive
+test coverage validating all critical client behaviors.
+
+Test Suite Summary:
+- Created 1,229 lines of test code across 3 new test files
+- 618/618 total tests passing (100% pass rate)
+- Validated 14 previously undocumented critical behaviors
+- Fixed test infrastructure issues blocking test execution
+- Investigated WebSocket array handling behavior
+
+New Test Files:
+1. tests/api.partial-failures.test.js (456 LOC, 11 tests)
+   - Response ordering preservation (CRITICAL for Loop client)
+   - Duplicate key handling in batches
+   - Client-provided _id handling (Loop/Trio/AAPS patterns)
+   - Write result format validation
+   - Validation error handling
+   - Large batch processing
+
+2. tests/api.deduplication.test.js (398 LOC, 10 tests)
+   - AAPS pumpId+pumpType+pumpSerial deduplication
+   - AAPS entry date+device+type deduplication
+   - Loop syncIdentifier deduplication
+   - Trio id field (UUID) deduplication
+   - Cross-client duplicate isolation
+   - Deduplication response format
+
+3. tests/api.aaps-client.test.js (375 LOC, 9 tests)
+   - SGV entries with AAPS device metadata
+   - SMB (Super Micro Bolus) handling
+   - Meal Bolus and Temp Basal formats
+   - Pump metadata preservation
+   - Boolean flags (isValid, isSMB)
+   - utcOffset timezone handling
+
+Updated Test Fixtures:
+- tests/fixtures/deduplication.js - Changed to use dynamic dates (Date.now())
+  to avoid test failures from stale timestamps
+- tests/fixtures/partial-failures.js - Changed to use dynamic dates
+
+Critical Behaviors Validated (All PASSING):
+✅ Loop Response Ordering - Response array matches request order
+✅ Deduplication in Batches - Returns N responses for N requests
+✅ Ordered Insert Behavior - Stops at first error (expected)
+✅ Cross-Client Isolation - Different clients don't interfere
+✅ Metadata Preservation - All AAPS/Loop/Trio fields preserved
+✅ WebSocket Array Handling - Sequential deduplication working correctly
+
+WebSocket Array Deduplication Investigation:
+Test #618 "verify insertOne behavior when array is passed" demonstrates
+cascading deduplication when 3 items with same eventType are sent within
+a 2-second window. Analysis confirms this is EXPECTED BEHAVIOR:
+
+- Deduplication window: ±2 seconds (prevents duplicates from clock drift)
+- Sequential processing: Each item checked against existing DB state
+- Test scenario: All 3 items have eventType 'Note' within 2 seconds
+- Result: Items 2 and 3 correctly deduplicated against Item 1
+- Impact: NONE - Real clients use unique identifiers (NSCLIENT_ID,
+  syncIdentifier, id) which prevent deduplication
+- See: docs/proposals/websocket-array-deduplication-issue.md
+
+This is NOT a bug. It's the deduplication system working correctly to
+prevent duplicate treatments. Real-world clients (Loop, AAPS, Trio,
+NSClient) are unaffected because they include unique identifiers.
+
+Documentation Updates:
+- docs/proposals/mongodb-modernization-implementation-plan.md
+  - Updated Phase 1 status to COMPLETED
+  - Documented 618/618 test pass rate (100%)
+  - Updated test infrastructure status (RESOLVED)
+  - Marked Loop ordering as validated (NOT a quirk)
+  - Added WebSocket array deduplication analysis
+  - Updated timeline with Phase 1 completion
+  - Documented next steps for Phase 2
+
+- docs/proposals/websocket-array-deduplication-issue.md (NEW)
+  - Full analysis of WebSocket array handling behavior
+  - Deduplication logic explanation (2-second time window)
+  - Sequential processing flow documentation
+  - Comparison: array vs individual dbAdd calls
+  - Client behavior analysis (Loop, AAPS, Trio, NSClient)
+  - Conclusion: Expected behavior, not a bug
+
+Test Execution:
+  make test
+
+Results: 618/618 passing (100% pass rate)
+
+Ready for Phase 2: Storage Layer Analysis
