@@ -11,6 +11,7 @@ HOSTNAME = "0.0.0.0"
 MONGO_CONNECTION = "mongodb://c1ed90009d75f8022d0a:49e461d71273f892a3e7@143.198.41.180/admin"
 API_SECRET = "nightscout_secure_password"
 INSECURE_USE_HTTP = "true"
+AUTH_FAIL_DELAY = "50"
 
 [workflows]
 runButton = "Project"
